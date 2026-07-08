@@ -4,12 +4,12 @@ async function login() {
     const loginBtn = document.querySelector('.btn');
     
     if (!email || !password) {
-        alert('Please enter both email and password.');
+        showNotification('Please enter both email and password.', 'error');
         return;
     }
 
     loginBtn.disabled = true;
-    loginBtn.innerText = 'Logging in...';
+    showSpinner(true);
 
     try {
         const response = await fetch(`${CONFIG.API_URL}/auth/login`, {
@@ -22,16 +22,16 @@ async function login() {
         
         if (response.ok) {
             sessionStorage.setItem('token', data.token);
+            showNotification('Login successful!');
             window.location.href = 'dashboard.html';
         } else {
-            alert(data.message || 'Login failed. Please check your credentials.');
+            showNotification(data.message || 'Login failed.', 'error');
         }
     } catch (e) {
-        console.error('Login error:', e);
-        alert('Network failure. Please check your connection.');
+        showNotification('Network failure. Please check your connection.', 'error');
     } finally {
         loginBtn.disabled = false;
-        loginBtn.innerText = 'Login';
+        showSpinner(false);
     }
 }
 
@@ -40,10 +40,10 @@ async function validateToken() {
     if (!token) return false;
 
     try {
-        // Assuming /api/auth/me exists and returns user info
         const response = await fetch(`${CONFIG.API_URL}/auth/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+        if (response.status === 401) throw new Error('Unauthorized');
         return response.ok;
     } catch (e) {
         return false;
