@@ -26,6 +26,12 @@
     </div>
     <script src="config.js"></script>
     <script src="auth.js"></script>
-    <script>window.onload = () => checkAuth(true);</script>
+    <script src="books.js"></script>
+    <script>
+        window.onload = async () => {
+            await checkAuth(true);
+            await fetchBooks();
+        };
+    </script>
 </body>
 </html>
